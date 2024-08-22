@@ -1,0 +1,77 @@
+document.addEventListener('DOMContentLoaded', function() {
+    // Generate time slots in the form
+    const timeSelect = document.getElementById('time');
+    for (let hour = 13; hour <= 23; hour++) {
+        const option = document.createElement('option');
+        const time = `${hour.toString().padStart(2, '0')}:00`;
+        option.value = time;
+        option.textContent = time;
+        timeSelect.appendChild(option);
+    }
+
+    // Handle form submission
+    document.getElementById('bookingForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const name = document.getElementById('name').value;
+        const phone = document.getElementById('phone').value;
+        const email = document.getElementById('email').value;
+        const date = document.getElementById('date').value;
+        const time = document.getElementById('time').value;
+
+        const appointmentText = `${time} - ${name}`;
+
+        // Find the corresponding calendar slot
+        const slotId = `${date}-${time}`;
+        const slot = document.getElementById(slotId);
+
+        if (slot) {
+            slot.classList.remove('available');
+            slot.classList.add('booked');
+            slot.innerHTML = `<div class="appointment">${appointmentText}</div>`;
+        }
+
+        // Send confirmation
+        sendConfirmation(phone, email, date, time);
+
+        // Clear form
+        document.getElementById('bookingForm').reset();
+    });
+
+    // Generate calendar slots
+    const calendarContainer = document.getElementById('calendarContainer');
+    const days = 7; // Showing a week's worth of slots
+    const today = new Date();
+
+    for (let i = 0; i < days; i++) {
+        const date = new Date(today);
+        date.setDate(today.getDate() + i);
+        const dateString = date.toISOString().split('T')[0];
+
+        for (let hour = 13; hour <= 23; hour++) {
+            const timeString = `${hour.toString().padStart(2, '0')}:00`;
+            const slotId = `${dateString}-${timeString}`;
+
+            const timeSlot = document.createElement('div');
+            timeSlot.id = slotId;
+            timeSlot.className = 'time-slot available';
+            timeSlot.innerHTML = `<strong>${timeString}</strong>`;
+            calendarContainer.appendChild(timeSlot);
+        }
+    }
+});
+
+// Mock function to simulate sending confirmation
+function sendConfirmation(phone, email, date, time) {
+    const message = `Bokningen är klar, kom ${date} kl ${time}`;
+
+    if (phone) {
+        // Simulate sending SMS
+        console.log(`Sending SMS to ${phone}: ${message}`);
+    }
+
+    if (email) {
+        // Simulate sending Email
+        console.log(`Sending Email to ${email}: ${message}`);
+    }
+}
